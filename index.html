@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>牛津沪教版七年级上册 Unit 1 You and Me · 智能默写系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f4faf8 0%, #e9f3ef 100%);
+            font-family: 'Segoe UI', 'Roboto', 'Poppins', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            padding: 30px 20px;
+            color: #1d2f3f;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* 头部区域 */
+        .hero {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(6px);
+            border-radius: 80px;
+            padding: 20px 20px;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.02);
+        }
+
+        .hero h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(130deg, #1e6f5c, #2c9a82);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .hero .subtitle {
+            color: #2c6e5c;
+            font-weight: 500;
+            border-bottom: 2px solid #bfe2d8;
+            display: inline-block;
+            padding-bottom: 6px;
+            margin-top: 8px;
+            font-size: 1rem;
+        }
+
+        .badge {
+            background: #d9f0ea;
+            border-radius: 30px;
+            padding: 6px 15px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-top: 12px;
+            color: #166b58;
+        }
+
+        /* 模式切换栏 */
+        .mode-bar {
+            background: white;
+            border-radius: 60px;
+            padding: 12px 20px;
+            margin-bottom: 35px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+            box-shadow: 0 12px 22px rgba(0, 0, 0, 0.08);
+            border: 1px solid #c2e0d6;
+        }
+
+        .mode-btn {
+            background: #eef3f1;
+            border: none;
+            padding: 10px 26px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #1c5e4f;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .mode-btn i {
+            margin-right: 6px;
+            font-weight: bold;
+        }
+
+        .mode-btn:hover {
+            background: #cde8e1;
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: #1e6f5c;
+            color: white;
+            box-shadow: 0 6px 12px rgba(30, 111, 92, 0.35);
+        }
+
+        /* 单词网格 */
+        .word-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 26px;
+        }
+
+        /* 卡片设计 */
+        .word-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(2px);
+            border-radius: 36px;
+            padding: 1.3rem 1.3rem 1.8rem;
+            transition: all 0.25s;
+            box-shadow: 0 18px 30px -12px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(70, 130, 110, 0.25);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .word-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 24px 36px -14px rgba(0, 0, 0, 0.18);
+            background: white;
+        }
+
+        /* 头部信息：序号 + 词性 + 音标 */
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #d2e9e2;
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+            gap: 8px;
+        }
+
+        .word-index {
+            background: #e5f3ef;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #1d755f;
+        }
+
+        .meaning {
+            font-size: 0.85rem;
+            background: #faf3e2;
+            padding: 4px 12px;
+            border-radius: 30px;
+            color: #aa7645;
+            font-weight: 500;
+        }
+
+        .ipa {
+            font-family: 'Courier New', 'Lucida Console', monospace;
+            font-size: 0.8rem;
+            background: #eef2f0;
+            padding: 4px 10px;
+            border-radius: 20px;
+            color: #3f6b5c;
+            letter-spacing: 0.2px;
+        }
+
+        /* 单词展示区 - 默写挖空核心 */
+        .word-display {
+            background: #fefdf7;
+            border-radius: 28px;
+            padding: 18px 12px;
+            text-align: center;
+            margin: 12px 0;
+            border: 1px solid #deede6;
+            transition: all 0.2s;
+            min-height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .masked-word {
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            word-break: break-all;
+            color: #1d6d58;
+            background: #f4f9f7;
+            padding: 8px 12px;
+            border-radius: 48px;
+        }
+
+        .original-word {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #1b4e41;
+            letter-spacing: 1px;
+        }
+
+        .hidden-placeholder {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: #bbada0;
+            font-family: monospace;
+            letter-spacing: 6px;
+        }
+
+        /* 语音按钮 */
+        .speak-btn {
+            background: #ecf3f0;
+            border: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 60px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #1a6e59;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .speak-btn:hover {
+            background: #cee5dd;
+            transform: scale(1.02);
+        }
+
+        /* 默写区域 */
+        .quiz-area {
+            margin-top: 16px;
+            background: #fefaf2;
+            border-radius: 32px;
+            padding: 14px 14px;
+            border: 1px solid #eee6d8;
+        }
+
+        .quiz-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .quiz-input {
+            flex: 4;
+            padding: 12px 18px;
+            border-radius: 50px;
+            border: 1px solid #cbdcd2;
+            background: white;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            font-family: 'Segoe UI', monospace;
+            font-weight: 500;
+        }
+
+        .quiz-input:focus {
+            outline: none;
+            border-color: #2f9c80;
+            box-shadow: 0 0 0 3px rgba(47, 156, 128, 0.2);
+        }
+
+        .check-btn {
+            background: #4f9d86;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 48px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .check-btn:hover {
+            background: #2c7a64;
+            transform: scale(0.98);
+        }
+
+        .feedback {
+            margin-top: 14px;
+            font-size: 0.8rem;
+            padding: 8px 14px;
+            border-radius: 34px;
+            background: #f2f4f2;
+            color: #2a5b4e;
+            transition: all 0.1s;
+        }
+
+        .feedback.correct {
+            background: #dff0e6;
+            color: #1e6f44;
+            border-left: 5px solid #2ecc71;
+        }
+
+        .feedback.wrong {
+            background: #ffe9e7;
+            color: #bc4e2c;
+            border-left: 5px solid #e67e22;
+        }
+
+        .info-note {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 10px;
+            color: #7f9e91;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 0.75rem;
+            color: #6c8e80;
+        }
+
+        @media (max-width: 720px) {
+            .word-grid {
+                grid-template-columns: 1fr;
+            }
+            .masked-word {
+                font-size: 1.4rem;
+                letter-spacing: 2px;
+            }
+            .mode-btn {
+                padding: 6px 16px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="hero">
+        <h1>🎧 牛津沪教版 · 七年级上册</h1>
+        <div class="subtitle">Unit 1 —— You and Me</div>
+        <div class="badge">🇬🇧 英式音标 & 真人发音 · 三种渐进式默写</div>
+    </div>
+
+    <div class="mode-bar">
+        <button class="mode-btn" data-mode="learning">📖 学习模式 (显示完整单词)</button>
+        <button class="mode-btn" data-mode="cons">🔤 辅音默写 (保留辅音 · 元音挖空)</button>
+        <button class="mode-btn" data-mode="vowel">🔊 元音默写 (保留元音 · 辅音挖空)</button>
+        <button class="mode-btn" data-mode="hidden">❓ 完全默写 (无字母提示)</button>
+    </div>
+
+    <div id="wordsContainer" class="word-grid"></div>
+    <div class="footer">
+        💡 默写模式下单词显示区自动隐藏原词，根据音标/释义填写完整单词，点击核对 → 支持英式发音
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // 单词库 (完整收录 Unit 1 You and Me)
+    // --------------------------------------------------------------
+    const wordsData = [
+        { word: "guitar", ipa: "/ɡɪˈtɑː(r)/", meaning: "n. 吉他" },
+        { word: "honest", ipa: "/ˈɒnɪst/", meaning: "adj. 诚实的" },
+        { word: "patient", ipa: "/ˈpeɪʃnt/", meaning: "adj. 有耐心的" },
+        { word: "improve", ipa: "/ɪmˈpruːv/", meaning: "v. 改进；改善" },
+        { word: "confident", ipa: "/ˈkɒnfɪdənt/", meaning: "adj. 自信的；有自信心的" },
+        { word: "courage", ipa: "/ˈkʌrɪdʒ/", meaning: "n. 勇气；胆量" },
+        { word: "friendship", ipa: "/ˈfrendʃɪp/", meaning: "n. 友谊；朋友关系" },
+        { word: "admiration", ipa: "/ˌædməˈreɪʃn/", meaning: "n. 钦佩；赞赏" },
+        { word: "respect", ipa: "/rɪˈspekt/", meaning: "n. 尊敬；尊重" },
+        { word: "support", ipa: "/səˈpɔːt/", meaning: "n. 支持；鼓励" },
+        { word: "trust", ipa: "/trʌst/", meaning: "n. 信任；信赖" },
+        { word: "survey", ipa: "/ˈsɜːveɪ/", meaning: "n. 调查" },
+        { word: "personal", ipa: "/ˈpɜːsənl/", meaning: "adj. 个性的；个人的" },
+        { word: "quality", ipa: "/ˈkwɒləti/", meaning: "n. 品质；品德" },
+        { word: "caring", ipa: "/ˈkeərɪŋ/", meaning: "adj. 关心他人的；体贴人的" },
+        { word: "describe", ipa: "/dɪˈskraɪb/", meaning: "v. 描述；形容" },
+        { word: "appearance", ipa: "/əˈpɪərəns/", meaning: "n. 外貌" },
+        { word: "straight", ipa: "/streɪt/", meaning: "adj. 直的" },
+        { word: "dark", ipa: "/dɑːk/", meaning: "adj. 褐色的；乌黑的" },
+        { word: "same", ipa: "/seɪm/", meaning: "adj. 同一的；相同的" },
+        { word: "basic", ipa: "/ˈbeɪsɪk/", meaning: "adj. 基本的；基础的" },
+        { word: "thought", ipa: "/θɔːt/", meaning: "n. 想法" },
+        { word: "however", ipa: "/haʊˈevə(r)/", meaning: "adv. 然而；不过" },
+        { word: "glad", ipa: "/ɡlæd/", meaning: "adj. 高兴的；愉快的" },
+        { word: "rise", ipa: "/raɪz/", meaning: "v. 上升" },
+        { word: "end", ipa: "/end/", meaning: "n. 结局；结尾" },
+        { word: "heart", ipa: "/hɑːt/", meaning: "n. 心；心脏" }
+    ];
+
+    // ---------- 辅助函数: 元音判断 ----------
+    function isVowel(char) {
+        return 'aeiou'.includes(char.toLowerCase());
+    }
+
+    // 根据模式生成显示在卡片上的“挖空提示字符串”
+    // mode: 'learning', 'cons', 'vowel', 'hidden'
+    function getMaskedString(word, mode) {
+        if (mode === 'learning') {
+            return { text: word, className: 'original-word' };
+        }
+        if (mode === 'hidden') {
+            // 完全隐藏：全部显示为下划线占位符，等长
+            const hiddenStr = '_'.repeat(word.length);
+            return { text: hiddenStr, className: 'hidden-placeholder' };
+        }
+        if (mode === 'cons') {
+            // 辅音默写：保留辅音字母，元音字母替换为 "_"
+            let result = '';
+            for (let ch of word) {
+                if (isVowel(ch)) {
+                    result += '_';
+                } else {
+                    result += ch;
+                }
+            }
+            return { text: result, className: 'masked-word' };
+        }
+        if (mode === 'vowel') {
+            // 元音默写：保留元音字母，辅音字母替换为 "_"
+            let result = '';
+            for (let ch of word) {
+                if (isVowel(ch)) {
+                    result += ch;
+                } else {
+                    result += '_';
+                }
+            }
+            return { text: result, className: 'masked-word' };
+        }
+        // fallback
+        return { text: word, className: 'original-word' };
+    }
+
+    // ------------------ 英式发音 (Web Speech API 英音优化) ------------------
+    let britishVoice = null;
+
+    function initVoices() {
+        if (typeof window.speechSynthesis === 'undefined') return;
+        const setVoice = () => {
+            const voices = speechSynthesis.getVoices();
+            if (voices.length) {
+                britishVoice = voices.find(voice => voice.lang === 'en-GB' || voice.lang.startsWith('en-GB')) ||
+                               voices.find(voice => voice.lang.includes('GB')) ||
+                               voices.find(voice => voice.lang.includes('en'));
+            }
+        };
+        setVoice();
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = setVoice;
+        }
+    }
+    initVoices();
+
+    function playBritishPronunciation(word) {
+        if (typeof window.speechSynthesis === 'undefined') {
+            console.warn("当前浏览器不支持语音合成");
+            return;
+        }
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'en-GB';
+        utterance.rate = 0.88;
+        utterance.pitch = 1.0;
+        if (britishVoice) utterance.voice = britishVoice;
+        speechSynthesis.cancel(); // 避免重叠
+        speechSynthesis.speak(utterance);
+    }
+
+    // 当前选中的模式
+    let currentMode = "learning";   // learning, cons, vowel, hidden
+
+    // 渲染所有卡片 (根据 currentMode)
+    function renderCards() {
+        const container = document.getElementById('wordsContainer');
+        if (!container) return;
+        let html = '';
+        wordsData.forEach((item, idx) => {
+            const word = item.word;
+            const maskedObj = getMaskedString(word, currentMode);
+            const displayText = maskedObj.text;
+            const displayClass = maskedObj.className;
+            const serial = idx + 1;
+
+            html += `
+                <div class="word-card" data-word-original="${word}" data-idx="${idx}">
+                    <div class="card-header">
+                        <span class="word-index">#${serial}</span>
+                        <span class="meaning">${escapeHtml(item.meaning)}</span>
+                        <span class="ipa">${escapeHtml(item.ipa)}</span>
+                    </div>
+                    <div class="word-display">
+                        <div class="${displayClass}">${escapeHtml(displayText)}</div>
+                        <button class="speak-btn" data-word="${word}" title="点击听英式发音">🔊</button>
+                    </div>
+                    <div class="quiz-area">
+                        <div class="quiz-row">
+                            <input type="text" class="quiz-input" placeholder="输入完整单词..." autocomplete="off" spellcheck="false">
+                            <button class="check-btn" data-idx="${idx}">✓ 核对</button>
+                        </div>
+                        <div class="feedback" id="fb-${idx}">📝 输入后点击核对</div>
+                    </div>
+                    <div class="info-note">
+                        ${currentMode === 'cons' ? '✏️ 提示：填写元音字母，补全单词' : (currentMode === 'vowel' ? '✏️ 提示：填写辅音字母，补全单词' : (currentMode === 'hidden' ? '🔍 根据音标/释义拼写整个单词' : '📖 学习模式可听发音'))}
+                    </div>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    // 简单防XSS
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+
+    // 重置所有输入框 & 反馈信息 (模式切换后清理)
+    function resetAllInputsAndFeedbacks() {
+        for (let i = 0; i < wordsData.length; i++) {
+            const fb = document.getElementById(`fb-${i}`);
+            if (fb) {
+                fb.innerHTML = `📝 输入后点击核对`;
+                fb.classList.remove('correct', 'wrong');
+            }
+            const card = document.querySelector(`.word-card[data-idx="${i}"]`);
+            if (card) {
+                const inputElem = card.querySelector('.quiz-input');
+                if (inputElem) inputElem.value = '';
+            }
+        }
+    }
+
+    // 全局事件委托 (语音按钮 + 核对按钮)
+    function attachDelegatedEvents() {
+        const container = document.getElementById('wordsContainer');
+        if (!container) return;
+
+        // 利用事件监听绑定到父容器
+        container.addEventListener('click', (e) => {
+            // 处理语音按钮
+            const speakBtn = e.target.closest('.speak-btn');
+            if (speakBtn) {
+                e.stopPropagation();
+                const word = speakBtn.getAttribute('data-word');
+                if (word) playBritishPronunciation(word);
+                return;
+            }
+
+            // 处理核对按钮
+            const checkBtn = e.target.closest('.check-btn');
+            if (checkBtn) {
+                e.preventDefault();
+                const idxAttr = checkBtn.getAttribute('data-idx');
+                if (idxAttr === null) return;
+                const idx = parseInt(idxAttr, 10);
+                const wordData = wordsData[idx];
+                if (!wordData) return;
+                const correctWord = wordData.word;
+                const card = checkBtn.closest('.word-card');
+                if (!card) return;
+                const inputField = card.querySelector('.quiz-input');
+                const userAnswer = inputField ? inputField.value.trim().toLowerCase() : '';
+                const feedbackDiv = document.getElementById(`fb-${idx}`);
+                if (userAnswer === correctWord.toLowerCase()) {
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = `✅ 完美！ “${correctWord}” 拼写正确 🎉`;
+                        feedbackDiv.classList.add('correct');
+                        feedbackDiv.classList.remove('wrong');
+                    }
+                } else {
+                    if (feedbackDiv) {
+                        feedbackDiv.innerHTML = `❌ 错误！ 正确答案是 “${correctWord}” 。根据音标再试试～`;
+                        feedbackDiv.classList.add('wrong');
+                        feedbackDiv.classList.remove('correct');
+                    }
+                }
+                if (inputField) inputField.focus();
+            }
+        });
+    }
+
+    // 切换模式: 更新currentMode，重新渲染，重置反馈和输入框
+    function setMode(mode) {
+        currentMode = mode;
+        renderCards();               // 全新生成 (单词展示区会根据新模式变化)
+        setTimeout(() => {
+            resetAllInputsAndFeedbacks();  // 清空所有输入和反馈
+        }, 10);
+        // 更新模式按钮 active 样式
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            const btnMode = btn.getAttribute('data-mode');
+            if (btnMode === mode) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    // 绑定模式按钮事件
+    function bindModeButtons() {
+        const btns = document.querySelectorAll('.mode-btn');
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const mode = btn.getAttribute('data-mode');
+                if (mode === 'learning') setMode('learning');
+                else if (mode === 'cons') setMode('cons');
+                else if (mode === 'vowel') setMode('vowel');
+                else if (mode === 'hidden') setMode('hidden');
+            });
+        });
+    }
+
+    // 预加载语音，避免首次点击延迟感
+    function warmupSpeech() {
+        if (window.speechSynthesis) {
+            const dummy = new SpeechSynthesisUtterance('ready');
+            dummy.lang = 'en-GB';
+            speechSynthesis.speak(dummy);
+            speechSynthesis.cancel();
+        }
+    }
+
+    // 初始化页面
+    function init() {
+        renderCards();
+        attachDelegatedEvents();
+        bindModeButtons();
+        warmupSpeech();
+        // 默认激活学习模式高亮
+        const defaultBtn = document.querySelector('.mode-btn[data-mode="learning"]');
+        if (defaultBtn) defaultBtn.classList.add('active');
+        // 额外确保所有feedback初始重置
+        resetAllInputsAndFeedbacks();
+    }
+
+    init();
+</script>
+</body>
+</html>
